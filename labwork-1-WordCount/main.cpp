@@ -38,6 +38,17 @@ Options parse_arguments(int argc, char* argv[]) {
 
     if (arg.empty()) continue;
 
+    if (arg == "--help" || arg == "-h") {
+      cout << "Usage: " << argv[0] << " [OPTIONS] file1 [file2 ...]\n"
+           << "Options:\n"
+           << "  -l, --lines     show only line count\n"
+           << "  -w, --words     show only word count\n"
+           << "  -c, --bytes     show only byte count\n"
+           << "  -m, --chars     show only character count\n"
+           << "  --help          display this help\n";
+      exit(0);
+    }
+
     if (arg[0] != '-' || arg == "-") {  // Имя файла
       opts.files.push_back(arg);
       continue;
@@ -61,7 +72,7 @@ Options parse_arguments(int argc, char* argv[]) {
       params.insert('m');
     } else {
       cerr << "Unexpected parametr `" << arg << "`. It will be ignored"
-                << std::endl;
+           << std::endl;
     }
   }
   opts.flag.show_lines = params.count('l');
@@ -87,7 +98,7 @@ FileStats count_file_stats(const string& filename) {
   ifstream file(filename, ios::binary);
   if (!file.is_open()) {
     cerr << "Error: Cannot open file '" << filename << "'" << endl;
-    return stats; // return false by default
+    return stats;  // return false by default
   }
 
   bool in_word = false;
@@ -128,7 +139,7 @@ void print_stats(const FileStats& stats, const Flags flags) {
   if (flags.show_words) cout << stats.words << " ";
   if (flags.show_bytes) cout << stats.bytes << " ";
   if (flags.show_chars) cout << stats.chars << " ";
-  
+
   cout << " " << stats.filename << endl;
 }
 
