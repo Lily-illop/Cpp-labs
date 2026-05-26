@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
         if (params.count('l')) cout << c_lines << " ";
         if (params.count('w')) cout << c_words << " ";
         if (params.count('c')) cout << c_bytes << " ";
-        if (params.count('m')) cout << c_words << " ";
+        if (params.count('m')) cout << c_chars << " ";
         cout << filename << "\n";
       }
 
