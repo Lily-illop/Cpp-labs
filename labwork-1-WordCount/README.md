@@ -38,3 +38,20 @@ _WordCount.exe  filename1 filename2 -lw --bytes_
 Для реализации утилиты потребуется воспользоваться стандартной библиотекой вводы\вывода ([описание](https://en.cppreference.com/w/cpp/io/basic_ifstream)).
 Пример того, как можно организовать  парсинг аргументов командной строки, можно посмотреть [здесь](http://www.cplusplus.com/articles/DEN36Up4/).
  
+
+
+## Фактическое готов. Запуск 
+
+```bash
+  cd build/
+  cmake ..
+  cmake --build 
+  cmake --build .
+  ls
+  ./WordCount.exe ../input/in1.txt 
+  ./WordCount.exe ../input/in2.txt 
+  ./WordCount.exe ../input/in1.txt ../input/in2.txt 
+  ./WordCount.exe ../input/in1.txt ../input/in2.txt --lines
+  ./WordCount.exe ../input/in1.txt ../input/in2.txt --lines --words
+  ./WordCount.exe ../input/in1.txt ../input/in2.txt -lwc
+ ```
