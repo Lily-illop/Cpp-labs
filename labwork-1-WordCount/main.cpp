@@ -7,31 +7,79 @@
 
 using namespace std;
 
-int main(int argc, char** argv) {
-  vector<string> files = vector<string>();
-  vector<string> result = vector<string>();
+struct Options {
+  bool show_lines = false;
+  bool show_words = false;
+  bool show_bytes = false;
+  bool show_chars = false;
+  vector<string> files;
+};
+
+
+// Парсинг аргументов командной строки
+Options parse_arguments(int argc, char* argv[]) {
+  Options opts;
+
   set<char> params = set<char>();
   for (int i = 1; i < argc; i++) {
-    string now_param = string(argv[i]);
+    string arg = argv[i];
 
-    if (now_param[0] == '-' && now_param[1] != '-') {
-      for (int j = 1; j < now_param.size(); j++) {
-        params.insert(now_param[j]);
+    if (arg.empty()) continue;
+
+    if (arg[0] != '-' || arg == "-") {  // Имя файла
+      opts.files.push_back(arg);
+      continue;
+    }
+
+    if (arg.size() > 1 && arg[1] != '-') {
+      for (int j = 1; j < arg.size(); j++) {
+        if (arg[j] == 'l' || arg[j] == 'w' || arg[j] == 'c' || arg[j] == 'm')
+          params.insert(arg[j]);
+        else
+          cout << "Warning: Unknown option '-" << arg[j]
+               << "'. It will be ignored" << endl;
       }
-    } else if (now_param == "--lines") {
+    } else if (arg == "--lines") {
       params.insert('l');
-    } else if (now_param == "--bytes") {
+    } else if (arg == "--bytes") {
       params.insert('c');
-    } else if (now_param == "--words") {
+    } else if (arg == "--words") {
       params.insert('w');
-    } else if (now_param == "--chars") {
+    } else if (arg == "--chars") {
       params.insert('m');
     } else {
-      files.push_back(now_param);
+      std::cout << "Unexpected parametr `" << arg << "`. It will be ignored"
+                << std::endl;
     }
   }
+  opts.show_lines = params.count('l');
+  opts.show_words = params.count('w');
+  opts.show_bytes = params.count('c');
+  opts.show_chars = params.count('m');
 
-  for (auto filename : files) {
+  // Если нет ни одной опции - выводить нужно все (кроме chars, как в wc)
+  if (!opts.show_lines && !opts.show_words && !opts.show_bytes &&
+      !opts.show_chars) {
+    opts.show_lines = true;
+    opts.show_words = true;
+    opts.show_bytes = true;
+  }
+
+  return opts;
+}
+
+int main(int argc, char** argv) {
+  Options opts = parse_arguments(argc, argv);
+
+  if (opts.files.empty()) {
+    cerr << "Found no filenames to prase. \nUsage: " << argv[0]
+         << " [OPTIONS] file1 [file2 ...]" << endl;
+    return 1;
+  }
+
+  vector<string> result = vector<string>();
+
+  for (auto filename : opts.files) {
     ifstream file(filename, ios::in);
     long int c_lines = 0;
 
@@ -59,16 +107,11 @@ int main(int argc, char** argv) {
       words_end = sregex_iterator();
       c_chars = distance(words_begin, words_end);
 
-      if (!params.size()) {
-        cout << c_lines << " " << c_words << " " << c_bytes << " " << filename
-             << "\n";
-      } else {
-        if (params.count('l')) cout << c_lines << " ";
-        if (params.count('w')) cout << c_words << " ";
-        if (params.count('c')) cout << c_bytes << " ";
-        if (params.count('m')) cout << c_chars << " ";
-        cout << filename << "\n";
-      }
+      if (opts.show_lines) cout << c_lines << " ";
+      if (opts.show_words) cout << c_words << " ";
+      if (opts.show_bytes) cout << c_bytes << " ";
+      if (opts.show_chars) cout << c_chars << " ";
+      cout << filename << "\n";
 
       file.close();
     } else {
